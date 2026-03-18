@@ -1,0 +1,2629 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>OpenCLI 命令导航</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f5f1e8;
+      --panel: rgba(255, 251, 245, 0.84);
+      --panel-strong: #fffdfa;
+      --text: #1e1b16;
+      --muted: #6e6257;
+      --line: rgba(61, 47, 34, 0.12);
+      --accent: #0f766e;
+      --accent-soft: rgba(15, 118, 110, 0.12);
+      --shadow: 0 24px 50px rgba(76, 58, 39, 0.12);
+      --radius: 24px;
+      --mono: "SF Mono", "JetBrains Mono", ui-monospace, monospace;
+      --sans: "PingFang SC", "Hiragino Sans GB", "Noto Sans CJK SC", sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      color: var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(15,118,110,0.18), transparent 30%),
+        radial-gradient(circle at top right, rgba(217,119,6,0.14), transparent 26%),
+        linear-gradient(180deg, #f8f4ec 0%, #f3ecdf 100%);
+    }
+    .shell {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 40px 24px 72px;
+    }
+    .hero {
+      background: var(--panel);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--line);
+      border-radius: calc(var(--radius) + 8px);
+      box-shadow: var(--shadow);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .hero h1 {
+      margin: 0 0 12px;
+      font-size: clamp(32px, 5vw, 56px);
+      line-height: 0.95;
+      letter-spacing: -0.04em;
+    }
+    .hero p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.6;
+      max-width: 920px;
+    }
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 14px;
+      margin-top: 22px;
+    }
+    .stat {
+      background: var(--panel-strong);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 16px 18px;
+    }
+    .stat strong {
+      display: block;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+      margin-bottom: 4px;
+    }
+    .controls {
+      display: grid;
+      grid-template-columns: 1.7fr repeat(3, minmax(150px, 0.6fr));
+      gap: 12px;
+      margin: 24px 0 16px;
+    }
+    .controls input,
+    .controls select {
+      width: 100%;
+      height: 52px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.88);
+      border-radius: 16px;
+      padding: 0 16px;
+      font-size: 15px;
+      color: var(--text);
+      outline: none;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.5);
+    }
+    .tips {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+    .tip {
+      background: rgba(255,255,255,0.7);
+      border: 1px dashed rgba(15, 118, 110, 0.25);
+      border-radius: 18px;
+      padding: 14px 16px;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+    .site-section {
+      margin-top: 28px;
+      border: 1px solid var(--line);
+      border-radius: 24px;
+      background: rgba(255, 252, 248, 0.7);
+      box-shadow: var(--shadow);
+      overflow: hidden;
+    }
+    .site-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      list-style: none;
+      cursor: pointer;
+      padding: 20px 22px;
+      user-select: none;
+      transition: background 160ms ease;
+    }
+    .site-header::-webkit-details-marker { display: none; }
+    .site-header:hover { background: rgba(255,255,255,0.45); }
+    .site-title-wrap {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+    .site-arrow {
+      width: 14px;
+      height: 14px;
+      border-right: 2px solid var(--accent);
+      border-bottom: 2px solid var(--accent);
+      transform: rotate(-45deg);
+      transition: transform 180ms ease;
+      margin-top: -4px;
+    }
+    .site-section[open] .site-arrow {
+      transform: rotate(45deg);
+      margin-top: 2px;
+    }
+    .site-header h2 {
+      margin: 0;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+    .site-header p {
+      margin: 4px 0 0;
+      color: var(--muted);
+    }
+    .site-body {
+      padding: 0 18px 18px;
+    }
+    .command-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(310px, 1fr));
+      gap: 14px;
+    }
+    .command-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+    .card-top {
+      display: flex;
+      gap: 14px;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 12px;
+    }
+    .command-name {
+      font-family: var(--mono);
+      font-size: 15px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+    .command-desc {
+      color: var(--muted);
+      line-height: 1.55;
+      min-height: 44px;
+    }
+    .copy-btn {
+      border: none;
+      background: var(--accent);
+      color: white;
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+    .meta-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      padding: 6px 10px;
+      border-radius: 999px;
+      background: var(--accent-soft);
+      color: var(--accent);
+      font-size: 12px;
+      font-weight: 700;
+    }
+    .detail-block {
+      background: rgba(255,255,255,0.75);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 12px 14px;
+      line-height: 1.7;
+      font-size: 14px;
+    }
+    code {
+      font-family: var(--mono);
+      font-size: 12px;
+      word-break: break-all;
+    }
+    .empty-state {
+      display: none;
+      margin-top: 28px;
+      background: rgba(255,255,255,0.76);
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+    }
+    .footer {
+      margin-top: 38px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center;
+    }
+    @media (max-width: 980px) {
+      .controls {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+    @media (max-width: 640px) {
+      .shell { padding: 18px 14px 42px; }
+      .hero { padding: 20px; }
+      .controls { grid-template-columns: 1fr; }
+      .card-top { flex-direction: column; }
+      .copy-btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="hero">
+      <h1>OpenCLI 命令导航</h1>
+      <p>这是一个专门为快速查命令设计的离线页面。你可以直接搜索站点、命令、参数和用途，按模式筛选是否需要浏览器，并一键复制调用示例。</p>
+      <div class="stats">
+        <div class="stat"><strong>81</strong><span>命令总数</span></div>
+        <div class="stat"><strong>18</strong><span>站点数量</span></div>
+        <div class="stat"><strong>5</strong><span>无需登录的公开命令</span></div>
+      </div>
+    </section>
+
+    <section class="controls">
+      <input id="searchInput" type="search" placeholder="搜索站点、命令、描述、参数，例如 reddit、字幕、hot、AAPL" />
+      <select id="siteFilter">
+        <option value="">全部站点</option>
+        <option value="bbc">BBC</option><option value="bilibili">Bilibili</option><option value="boss">BOSS 直聘</option><option value="coupang">Coupang</option><option value="ctrip">携程</option><option value="hackernews">Hacker News</option><option value="linkedin">LinkedIn</option><option value="reddit">Reddit</option><option value="reuters">Reuters</option><option value="smzdm">什么值得买</option><option value="twitter">Twitter / X</option><option value="v2ex">V2EX</option><option value="weibo">微博</option><option value="xiaohongshu">小红书</option><option value="xueqiu">雪球</option><option value="yahoo-finance">Yahoo Finance</option><option value="youtube">YouTube</option><option value="zhihu">知乎</option>
+      </select>
+      <select id="strategyFilter">
+        <option value="">全部模式</option>
+        <option value="public">公开接口</option>
+        <option value="cookie">登录态 / Cookie</option>
+        <option value="intercept">网络拦截</option>
+        <option value="ui">页面交互</option>
+        <option value="header">请求头认证</option>
+      </select>
+      <select id="browserFilter">
+        <option value="">浏览器不限</option>
+        <option value="yes">需要浏览器</option>
+        <option value="no">无需浏览器</option>
+      </select>
+    </section>
+
+    <section class="tips">
+      <div class="tip"><strong>交互提示：</strong>先在搜索框里输入站点名或动词，比如 <code>reddit</code>、<code>search</code>、<code>字幕</code>，可以立刻缩小范围。</div>
+      <div class="tip"><strong>交互提示：</strong>如果你只想找能直接用的命令，优先选择“公开接口”或“无需浏览器”。</div>
+      <div class="tip"><strong>交互提示：</strong>点“复制”会把 <code>opencli-skill 站点 命令</code> 写入剪贴板，方便你直接以 Skill 的方式继续调用。</div>
+    </section>
+
+    <div id="results">
+      
+      <details class="site-section" data-site="bbc">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>BBC</h2>
+              <p>1 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="bbc"
+                    data-strategy="public"
+                    data-browser="yes"
+                    data-keywords="bbc news bbc 查看 bbc 新闻头条（rss） 公开接口 limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bbc news</div>
+                        <div class="command-desc">查看 BBC 新闻头条（RSS）</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bbc news">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">公开接口</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bbc news</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="bilibili">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>Bilibili</h2>
+              <p>11 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili dynamic bilibili 获取 bilibili 用户动态流 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili dynamic</div>
+                        <div class="command-desc">获取 Bilibili 用户动态流</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili dynamic">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili dynamic</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili favorite bilibili 查看我的默认收藏夹 登录态 / cookie limit, page"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili favorite</div>
+                        <div class="command-desc">查看我的默认收藏夹</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili favorite">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit, page</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili favorite</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili feed bilibili 查看关注用户的动态时间线 登录态 / cookie limit, type"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili feed</div>
+                        <div class="command-desc">查看关注用户的动态时间线</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili feed">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit, type</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili feed</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili following bilibili 查看 bilibili 用户关注列表 登录态 / cookie uid, page, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili following</div>
+                        <div class="command-desc">查看 Bilibili 用户关注列表</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili following">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>uid, page, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili following</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili history bilibili 查看我的观看历史 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili history</div>
+                        <div class="command-desc">查看我的观看历史</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili history">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili history</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili hot bilibili 查看 b 站热门视频 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili hot</div>
+                        <div class="command-desc">查看 B 站热门视频</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili hot">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili hot</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili me bilibili 查看我的 bilibili 个人资料 登录态 / cookie 无"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili me</div>
+                        <div class="command-desc">查看我的 Bilibili 个人资料</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili me">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>无</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili me</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili ranking bilibili 查看 bilibili 排行榜 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili ranking</div>
+                        <div class="command-desc">查看 Bilibili 排行榜</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili ranking">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili ranking</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili search bilibili 搜索 bilibili 视频或用户 登录态 / cookie keyword, type, page, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili search</div>
+                        <div class="command-desc">搜索 Bilibili 视频或用户</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>keyword, type, page, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili search</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili subtitle bilibili 获取 bilibili 视频字幕 登录态 / cookie bvid, lang"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili subtitle</div>
+                        <div class="command-desc">获取 Bilibili 视频字幕</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili subtitle">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>bvid, lang</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili subtitle</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="bilibili"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="bilibili user-videos bilibili 查看指定用户投稿视频 登录态 / cookie uid, limit, order, page"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">bilibili user-videos</div>
+                        <div class="command-desc">查看指定用户投稿视频</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill bilibili user-videos">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>uid, limit, order, page</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill bilibili user-videos</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="boss">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>BOSS 直聘</h2>
+              <p>2 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="boss"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="boss detail boss 直聘 查看 boss 直聘职位详情 登录态 / cookie security_id"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">boss detail</div>
+                        <div class="command-desc">查看 BOSS 直聘职位详情</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill boss detail">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>security_id</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill boss detail</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="boss"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="boss search boss 直聘 搜索 boss 直聘职位 登录态 / cookie query, city, experience, degree, salary, industry, page, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">boss search</div>
+                        <div class="command-desc">搜索 BOSS 直聘职位</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill boss search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, city, experience, degree, salary, industry, page, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill boss search</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="coupang">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>Coupang</h2>
+              <p>2 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="coupang"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="coupang add-to-cart coupang 将 coupang 商品加入购物车 登录态 / cookie productid, url"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">coupang add-to-cart</div>
+                        <div class="command-desc">将 Coupang 商品加入购物车</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill coupang add-to-cart">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>productId, url</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill coupang add-to-cart</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="coupang"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="coupang search coupang 搜索 coupang 商品 登录态 / cookie query, page, limit, filter"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">coupang search</div>
+                        <div class="command-desc">搜索 Coupang 商品</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill coupang search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, page, limit, filter</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill coupang search</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="ctrip">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>携程</h2>
+              <p>1 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="ctrip"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="ctrip search 携程 搜索携程旅行内容 登录态 / cookie query, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">ctrip search</div>
+                        <div class="command-desc">搜索携程旅行内容</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill ctrip search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill ctrip search</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="hackernews">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>Hacker News</h2>
+              <p>1 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="hackernews"
+                    data-strategy="public"
+                    data-browser="no"
+                    data-keywords="hackernews top hacker news 查看 hacker news 热门文章 公开接口 limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">hackernews top</div>
+                        <div class="command-desc">查看 Hacker News 热门文章</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill hackernews top">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">公开接口</span>
+                      <span class="chip">无需浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill hackernews top</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="linkedin">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>LinkedIn</h2>
+              <p>1 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="linkedin"
+                    data-strategy="header"
+                    data-browser="yes"
+                    data-keywords="linkedin search linkedin 搜索 linkedin 职位 请求头认证 query, location, limit, start, details, company, experience_level, job_type, date_posted, remote"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">linkedin search</div>
+                        <div class="command-desc">搜索 LinkedIn 职位</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill linkedin search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">请求头认证</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, location, limit, start, details, company, experience_level, job_type, date_posted, remote</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill linkedin search</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="reddit">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>Reddit</h2>
+              <p>15 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit comment reddit 给 reddit 帖子发表评论 登录态 / cookie post_id, text"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit comment</div>
+                        <div class="command-desc">给 Reddit 帖子发表评论</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit comment">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>post_id, text</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit comment</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit frontpage reddit 查看 reddit 首页内容 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit frontpage</div>
+                        <div class="command-desc">查看 Reddit 首页内容</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit frontpage">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit frontpage</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit hot reddit 查看 reddit 热门帖子 登录态 / cookie subreddit, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit hot</div>
+                        <div class="command-desc">查看 Reddit 热门帖子</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit hot">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>subreddit, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit hot</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit popular reddit 查看 reddit popular 热门内容 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit popular</div>
+                        <div class="command-desc">查看 Reddit Popular 热门内容</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit popular">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit popular</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit read reddit 阅读 reddit 帖子与评论 登录态 / cookie post_id, sort, limit, depth, replies, max_length"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit read</div>
+                        <div class="command-desc">阅读 Reddit 帖子与评论</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit read">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>post_id, sort, limit, depth, replies, max_length</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit read</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit save reddit 收藏或取消收藏 reddit 帖子 登录态 / cookie post_id, undo"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit save</div>
+                        <div class="command-desc">收藏或取消收藏 Reddit 帖子</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit save">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>post_id, undo</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit save</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit saved reddit 查看我收藏的 reddit 帖子 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit saved</div>
+                        <div class="command-desc">查看我收藏的 Reddit 帖子</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit saved">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit saved</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit search reddit 搜索 reddit 帖子 登录态 / cookie query, subreddit, sort, time, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit search</div>
+                        <div class="command-desc">搜索 Reddit 帖子</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, subreddit, sort, time, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit search</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit subreddit reddit 查看指定 reddit 子版块内容 登录态 / cookie name, sort, time, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit subreddit</div>
+                        <div class="command-desc">查看指定 Reddit 子版块内容</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit subreddit">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>name, sort, time, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit subreddit</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit subscribe reddit 订阅或取消订阅子版块 登录态 / cookie subreddit, undo"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit subscribe</div>
+                        <div class="command-desc">订阅或取消订阅子版块</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit subscribe">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>subreddit, undo</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit subscribe</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit upvote reddit 给 reddit 帖子点赞或点踩 登录态 / cookie post_id, direction"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit upvote</div>
+                        <div class="command-desc">给 Reddit 帖子点赞或点踩</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit upvote">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>post_id, direction</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit upvote</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit upvoted reddit 查看我点过赞的 reddit 帖子 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit upvoted</div>
+                        <div class="command-desc">查看我点过赞的 Reddit 帖子</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit upvoted">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit upvoted</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit user reddit 查看 reddit 用户资料 登录态 / cookie username"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit user</div>
+                        <div class="command-desc">查看 Reddit 用户资料</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit user">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>username</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit user</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit user-comments reddit 查看 reddit 用户评论历史 登录态 / cookie username, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit user-comments</div>
+                        <div class="command-desc">查看 Reddit 用户评论历史</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit user-comments">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>username, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit user-comments</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="reddit"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reddit user-posts reddit 查看 reddit 用户发帖历史 登录态 / cookie username, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reddit user-posts</div>
+                        <div class="command-desc">查看 Reddit 用户发帖历史</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reddit user-posts">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>username, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reddit user-posts</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="reuters">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>Reuters</h2>
+              <p>1 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="reuters"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="reuters search reuters 搜索路透社新闻 登录态 / cookie query, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">reuters search</div>
+                        <div class="command-desc">搜索路透社新闻</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill reuters search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill reuters search</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="smzdm">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>什么值得买</h2>
+              <p>1 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="smzdm"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="smzdm search 什么值得买 搜索什么值得买好价 登录态 / cookie keyword, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">smzdm search</div>
+                        <div class="command-desc">搜索什么值得买好价</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill smzdm search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>keyword, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill smzdm search</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="twitter">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>Twitter / X</h2>
+              <p>18 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="twitter article twitter / x 提取 twitter 长文并导出为 markdown 登录态 / cookie tweet_id"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter article</div>
+                        <div class="command-desc">提取 Twitter 长文并导出为 Markdown</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter article">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>tweet_id</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter article</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="ui"
+                    data-browser="yes"
+                    data-keywords="twitter bookmark twitter / x 收藏推文 页面交互 url"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter bookmark</div>
+                        <div class="command-desc">收藏推文</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter bookmark">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">页面交互</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>url</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter bookmark</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="twitter bookmarks twitter / x 查看 twitter / x 书签 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter bookmarks</div>
+                        <div class="command-desc">查看 Twitter / X 书签</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter bookmarks">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter bookmarks</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="ui"
+                    data-browser="yes"
+                    data-keywords="twitter delete twitter / x 删除指定推文 页面交互 url"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter delete</div>
+                        <div class="command-desc">删除指定推文</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter delete">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">页面交互</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>url</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter delete</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="ui"
+                    data-browser="yes"
+                    data-keywords="twitter follow twitter / x 关注 twitter 用户 页面交互 username"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter follow</div>
+                        <div class="command-desc">关注 Twitter 用户</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter follow">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">页面交互</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>username</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter follow</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="intercept"
+                    data-browser="yes"
+                    data-keywords="twitter followers twitter / x 查看 twitter / x 粉丝列表 网络拦截 user, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter followers</div>
+                        <div class="command-desc">查看 Twitter / X 粉丝列表</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter followers">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">网络拦截</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>user, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter followers</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="intercept"
+                    data-browser="yes"
+                    data-keywords="twitter following twitter / x 查看 twitter / x 关注列表 网络拦截 user, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter following</div>
+                        <div class="command-desc">查看 Twitter / X 关注列表</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter following">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">网络拦截</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>user, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter following</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="ui"
+                    data-browser="yes"
+                    data-keywords="twitter like twitter / x 点赞指定推文 页面交互 url"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter like</div>
+                        <div class="command-desc">点赞指定推文</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter like">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">页面交互</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>url</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter like</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="intercept"
+                    data-browser="yes"
+                    data-keywords="twitter notifications twitter / x 查看 twitter / x 通知 网络拦截 limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter notifications</div>
+                        <div class="command-desc">查看 Twitter / X 通知</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter notifications">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">网络拦截</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter notifications</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="ui"
+                    data-browser="yes"
+                    data-keywords="twitter post twitter / x 发布新推文或线程 页面交互 text"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter post</div>
+                        <div class="command-desc">发布新推文或线程</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter post">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">页面交互</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>text</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter post</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="twitter profile twitter / x 查看 twitter 用户资料 登录态 / cookie username"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter profile</div>
+                        <div class="command-desc">查看 Twitter 用户资料</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter profile">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>username</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter profile</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="ui"
+                    data-browser="yes"
+                    data-keywords="twitter reply twitter / x 回复指定推文 页面交互 url, text"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter reply</div>
+                        <div class="command-desc">回复指定推文</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter reply">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">页面交互</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>url, text</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter reply</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="intercept"
+                    data-browser="yes"
+                    data-keywords="twitter search twitter / x 搜索 twitter / x 推文 网络拦截 query, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter search</div>
+                        <div class="command-desc">搜索 Twitter / X 推文</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">网络拦截</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter search</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="twitter thread twitter / x 查看推文线程及回复 登录态 / cookie tweet_id, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter thread</div>
+                        <div class="command-desc">查看推文线程及回复</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter thread">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>tweet_id, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter thread</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="twitter timeline twitter / x 查看 twitter 首页时间线 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter timeline</div>
+                        <div class="command-desc">查看 Twitter 首页时间线</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter timeline">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter timeline</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="twitter trending twitter / x 查看 twitter / x 热门话题 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter trending</div>
+                        <div class="command-desc">查看 Twitter / X 热门话题</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter trending">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter trending</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="ui"
+                    data-browser="yes"
+                    data-keywords="twitter unbookmark twitter / x 取消收藏推文 页面交互 url"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter unbookmark</div>
+                        <div class="command-desc">取消收藏推文</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter unbookmark">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">页面交互</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>url</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter unbookmark</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="twitter"
+                    data-strategy="ui"
+                    data-browser="yes"
+                    data-keywords="twitter unfollow twitter / x 取消关注 twitter 用户 页面交互 username"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">twitter unfollow</div>
+                        <div class="command-desc">取消关注 Twitter 用户</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill twitter unfollow">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">页面交互</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>username</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill twitter unfollow</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="v2ex">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>V2EX</h2>
+              <p>6 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="v2ex"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="v2ex daily v2ex 执行 v2ex 每日签到 登录态 / cookie 无"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">v2ex daily</div>
+                        <div class="command-desc">执行 V2EX 每日签到</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill v2ex daily">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>无</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill v2ex daily</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="v2ex"
+                    data-strategy="public"
+                    data-browser="no"
+                    data-keywords="v2ex hot v2ex 查看 v2ex 热门话题 公开接口 limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">v2ex hot</div>
+                        <div class="command-desc">查看 V2EX 热门话题</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill v2ex hot">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">公开接口</span>
+                      <span class="chip">无需浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill v2ex hot</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="v2ex"
+                    data-strategy="public"
+                    data-browser="no"
+                    data-keywords="v2ex latest v2ex 查看 v2ex 最新话题 公开接口 limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">v2ex latest</div>
+                        <div class="command-desc">查看 V2EX 最新话题</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill v2ex latest">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">公开接口</span>
+                      <span class="chip">无需浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill v2ex latest</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="v2ex"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="v2ex me v2ex 查看 v2ex 个人资料 登录态 / cookie 无"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">v2ex me</div>
+                        <div class="command-desc">查看 V2EX 个人资料</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill v2ex me">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>无</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill v2ex me</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="v2ex"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="v2ex notifications v2ex 查看 v2ex 提醒 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">v2ex notifications</div>
+                        <div class="command-desc">查看 V2EX 提醒</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill v2ex notifications">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill v2ex notifications</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="v2ex"
+                    data-strategy="public"
+                    data-browser="no"
+                    data-keywords="v2ex topic v2ex 查看 v2ex 主题详情和回复 公开接口 id"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">v2ex topic</div>
+                        <div class="command-desc">查看 V2EX 主题详情和回复</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill v2ex topic">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">公开接口</span>
+                      <span class="chip">无需浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>id</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill v2ex topic</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="weibo">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>微博</h2>
+              <p>1 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="weibo"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="weibo hot 微博 查看微博热搜 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">weibo hot</div>
+                        <div class="command-desc">查看微博热搜</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill weibo hot">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill weibo hot</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="xiaohongshu">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>小红书</h2>
+              <p>4 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="xiaohongshu"
+                    data-strategy="intercept"
+                    data-browser="yes"
+                    data-keywords="xiaohongshu feed 小红书 查看小红书首页推荐流 网络拦截 limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xiaohongshu feed</div>
+                        <div class="command-desc">查看小红书首页推荐流</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xiaohongshu feed">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">网络拦截</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xiaohongshu feed</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="xiaohongshu"
+                    data-strategy="intercept"
+                    data-browser="yes"
+                    data-keywords="xiaohongshu notifications 小红书 查看小红书通知 网络拦截 type, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xiaohongshu notifications</div>
+                        <div class="command-desc">查看小红书通知</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xiaohongshu notifications">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">网络拦截</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>type, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xiaohongshu notifications</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="xiaohongshu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="xiaohongshu search 小红书 搜索小红书笔记 登录态 / cookie keyword, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xiaohongshu search</div>
+                        <div class="command-desc">搜索小红书笔记</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xiaohongshu search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>keyword, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xiaohongshu search</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="xiaohongshu"
+                    data-strategy="intercept"
+                    data-browser="yes"
+                    data-keywords="xiaohongshu user 小红书 查看小红书用户笔记 网络拦截 id, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xiaohongshu user</div>
+                        <div class="command-desc">查看小红书用户笔记</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xiaohongshu user">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">网络拦截</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>id, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xiaohongshu user</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="xueqiu">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>雪球</h2>
+              <p>6 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="xueqiu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="xueqiu feed 雪球 查看雪球首页时间线 登录态 / cookie page, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xueqiu feed</div>
+                        <div class="command-desc">查看雪球首页时间线</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xueqiu feed">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>page, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xueqiu feed</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="xueqiu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="xueqiu hot 雪球 查看雪球热门动态 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xueqiu hot</div>
+                        <div class="command-desc">查看雪球热门动态</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xueqiu hot">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xueqiu hot</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="xueqiu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="xueqiu hot-stock 雪球 查看雪球热门股票榜 登录态 / cookie limit, type"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xueqiu hot-stock</div>
+                        <div class="command-desc">查看雪球热门股票榜</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xueqiu hot-stock">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit, type</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xueqiu hot-stock</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="xueqiu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="xueqiu search 雪球 搜索雪球股票 登录态 / cookie query, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xueqiu search</div>
+                        <div class="command-desc">搜索雪球股票</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xueqiu search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xueqiu search</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="xueqiu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="xueqiu stock 雪球 查看雪球股票实时行情 登录态 / cookie symbol"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xueqiu stock</div>
+                        <div class="command-desc">查看雪球股票实时行情</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xueqiu stock">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>symbol</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xueqiu stock</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="xueqiu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="xueqiu watchlist 雪球 查看雪球自选股列表 登录态 / cookie category, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">xueqiu watchlist</div>
+                        <div class="command-desc">查看雪球自选股列表</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill xueqiu watchlist">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>category, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill xueqiu watchlist</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="yahoo-finance">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>Yahoo Finance</h2>
+              <p>1 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="yahoo-finance"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="yahoo-finance quote yahoo finance 查看 yahoo finance 股票行情 登录态 / cookie symbol"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">yahoo-finance quote</div>
+                        <div class="command-desc">查看 Yahoo Finance 股票行情</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill yahoo-finance quote">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>symbol</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill yahoo-finance quote</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="youtube">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>YouTube</h2>
+              <p>6 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="youtube"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="youtube search youtube 搜索 youtube 视频 登录态 / cookie query, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">youtube search</div>
+                        <div class="command-desc">搜索 YouTube 视频</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill youtube search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>query, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill youtube search</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="youtube"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="youtube transcript youtube 获取 youtube 视频字幕或转录 登录态 / cookie url, lang, mode"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">youtube transcript</div>
+                        <div class="command-desc">获取 YouTube 视频字幕或转录</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill youtube transcript">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>url, lang, mode</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill youtube transcript</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="youtube"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="youtube transcript-group youtube youtube 字幕分组辅助命令 登录态 / cookie 无"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">youtube transcript-group</div>
+                        <div class="command-desc">YouTube 字幕分组辅助命令</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill youtube transcript-group">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>无</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill youtube transcript-group</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="youtube"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="youtube transcript-group.test youtube youtube 字幕分组测试辅助命令 登录态 / cookie 无"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">youtube transcript-group.test</div>
+                        <div class="command-desc">YouTube 字幕分组测试辅助命令</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill youtube transcript-group.test">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>无</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill youtube transcript-group.test</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="youtube"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="youtube utils youtube youtube 工具辅助命令 登录态 / cookie 无"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">youtube utils</div>
+                        <div class="command-desc">YouTube 工具辅助命令</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill youtube utils">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>无</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill youtube utils</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="youtube"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="youtube video youtube 查看 youtube 视频元数据 登录态 / cookie url"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">youtube video</div>
+                        <div class="command-desc">查看 YouTube 视频元数据</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill youtube video">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>url</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill youtube video</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+      <details class="site-section" data-site="zhihu">
+        <summary class="site-header">
+          <div class="site-title-wrap">
+            <span class="site-arrow" aria-hidden="true"></span>
+            <div>
+              <h2>知乎</h2>
+              <p>3 个命令，默认折叠，点击展开</p>
+            </div>
+          </div>
+        </summary>
+        <div class="site-body">
+          <div class="command-grid">
+            
+                  <article
+                    class="command-card"
+                    data-site="zhihu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="zhihu hot 知乎 查看知乎热榜 登录态 / cookie limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">zhihu hot</div>
+                        <div class="command-desc">查看知乎热榜</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill zhihu hot">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill zhihu hot</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="zhihu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="zhihu question 知乎 查看知乎问题详情和回答 登录态 / cookie id, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">zhihu question</div>
+                        <div class="command-desc">查看知乎问题详情和回答</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill zhihu question">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>id, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill zhihu question</code></div>
+                    </div>
+                  </article>
+                
+                  <article
+                    class="command-card"
+                    data-site="zhihu"
+                    data-strategy="cookie"
+                    data-browser="yes"
+                    data-keywords="zhihu search 知乎 搜索知乎内容 登录态 / cookie keyword, limit"
+                  >
+                    <div class="card-top">
+                      <div>
+                        <div class="command-name">zhihu search</div>
+                        <div class="command-desc">搜索知乎内容</div>
+                      </div>
+                      <button class="copy-btn" data-command="opencli-skill zhihu search">复制</button>
+                    </div>
+                    <div class="meta-row">
+                      <span class="chip">登录态 / Cookie</span>
+                      <span class="chip">需要浏览器</span>
+                    </div>
+                    <div class="detail-block">
+                      <div><strong>参数：</strong>keyword, limit</div>
+                      <div><strong>复制内容：</strong><code>opencli-skill zhihu search</code></div>
+                    </div>
+                  </article>
+                
+          </div>
+        </div>
+      </details>
+    
+    </div>
+    <div id="emptyState" class="empty-state">没有匹配结果。可以试试更短的关键词，或者清空筛选条件。</div>
+
+    <div class="footer">
+      页面由 <code>scripts/generate-opencli-guide.mjs</code> 基于 OpenCLI manifest 自动生成。
+    </div>
+  </main>
+
+  <script>
+    const searchInput = document.getElementById("searchInput");
+    const siteFilter = document.getElementById("siteFilter");
+    const strategyFilter = document.getElementById("strategyFilter");
+    const browserFilter = document.getElementById("browserFilter");
+    const sections = Array.from(document.querySelectorAll(".site-section"));
+    const cards = Array.from(document.querySelectorAll(".command-card"));
+    const emptyState = document.getElementById("emptyState");
+
+    function applyFilters() {
+      const query = searchInput.value.trim().toLowerCase();
+      const site = siteFilter.value;
+      const strategy = strategyFilter.value;
+      const browser = browserFilter.value;
+
+      let visibleCards = 0;
+
+      cards.forEach((card) => {
+        const matchesQuery = !query || card.dataset.keywords.includes(query);
+        const matchesSite = !site || card.dataset.site === site;
+        const matchesStrategy = !strategy || card.dataset.strategy === strategy;
+        const matchesBrowser = !browser || card.dataset.browser === browser;
+        const visible = matchesQuery && matchesSite && matchesStrategy && matchesBrowser;
+        card.style.display = visible ? "" : "none";
+        if (visible) visibleCards += 1;
+      });
+
+      sections.forEach((section) => {
+        const hasVisible = Array.from(section.querySelectorAll(".command-card")).some(
+          (card) => card.style.display !== "none"
+        );
+        section.style.display = hasVisible ? "" : "none";
+        section.open = false;
+        if ((query || site || strategy || browser) && hasVisible) {
+          section.open = true;
+        }
+      });
+
+      emptyState.style.display = visibleCards === 0 ? "block" : "none";
+    }
+
+    [searchInput, siteFilter, strategyFilter, browserFilter].forEach((element) => {
+      element.addEventListener("input", applyFilters);
+      element.addEventListener("change", applyFilters);
+    });
+
+    document.querySelectorAll(".copy-btn").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const text = button.dataset.command;
+        try {
+          await navigator.clipboard.writeText(text);
+          const original = button.textContent;
+          button.textContent = "已复制";
+          setTimeout(() => {
+            button.textContent = original;
+          }, 1200);
+        } catch (error) {
+          button.textContent = "复制失败";
+          setTimeout(() => {
+            button.textContent = "复制";
+          }, 1200);
+        }
+      });
+    });
+
+    searchInput.focus();
+    applyFilters();
+  </script>
+</body>
+</html>
