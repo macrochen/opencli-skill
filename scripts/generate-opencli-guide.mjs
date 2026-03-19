@@ -117,6 +117,7 @@ const commandDescriptions = {
   "youtube/utils": "YouTube 工具辅助命令",
   "youtube/video": "查看 YouTube 视频元数据",
   "zhihu/hot": "查看知乎热榜",
+  "zhihu/detail": "抓取知乎问题与高赞回答，返回适合上层按模板总结的标准化材料",
   "zhihu/question": "查看知乎问题详情和回答",
   "zhihu/search": "搜索知乎内容",
 };
@@ -150,6 +151,10 @@ function argsToText(args) {
 
 function buildUsage(item) {
   return `opencli-skill ${item.site} ${item.name}`;
+}
+
+function buildCommandId(item) {
+  return `${item.site}/${item.name}`;
 }
 
 const manifest = loadManifest()
@@ -198,6 +203,7 @@ const cardsHtml = siteGroups
                 (item) => `
                   <article
                     class="command-card"
+                    data-command-id="${escapeHtml(buildCommandId(item))}"
                     data-site="${escapeHtml(item.site)}"
                     data-strategy="${escapeHtml(item.strategy)}"
                     data-browser="${item.browser ? "yes" : "no"}"
@@ -217,7 +223,16 @@ const cardsHtml = siteGroups
                         <div class="command-name">${escapeHtml(item.site)} ${escapeHtml(item.name)}</div>
                         <div class="command-desc">${escapeHtml(item.descriptionZh)}</div>
                       </div>
-                      <button class="copy-btn" data-command="${escapeHtml(buildUsage(item))}">复制</button>
+                      <div class="card-actions">
+                        <button
+                          class="pin-btn"
+                          type="button"
+                          data-pin-button="true"
+                          aria-pressed="false"
+                          data-command-id="${escapeHtml(buildCommandId(item))}"
+                        >置顶</button>
+                        <button class="copy-btn" type="button" data-command="${escapeHtml(buildUsage(item))}">复制</button>
+                      </div>
                     </div>
                     <div class="meta-row">
                       <span class="chip">${escapeHtml(item.strategyLabel)}</span>
@@ -418,12 +433,72 @@ const html = `<!doctype html>
       box-shadow: var(--shadow);
       padding: 18px;
     }
+    .favorites-panel {
+      margin: 0 0 24px;
+      background: linear-gradient(135deg, rgba(15, 118, 110, 0.14), rgba(217, 119, 6, 0.08));
+      border: 1px solid rgba(15, 118, 110, 0.18);
+      border-radius: 24px;
+      box-shadow: var(--shadow);
+      padding: 20px;
+    }
+    .favorites-panel[hidden] {
+      display: none;
+    }
+    .favorites-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+    .favorites-header h2 {
+      margin: 0 0 6px;
+      font-size: 28px;
+      letter-spacing: -0.03em;
+    }
+    .favorites-header p {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .favorites-tools {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+    .ghost-btn {
+      border: 1px solid rgba(15, 118, 110, 0.25);
+      background: rgba(255, 255, 255, 0.74);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .favorites-empty {
+      margin: 0;
+      color: var(--muted);
+      line-height: 1.6;
+      background: rgba(255,255,255,0.62);
+      border: 1px dashed rgba(15, 118, 110, 0.2);
+      border-radius: 18px;
+      padding: 16px;
+    }
     .card-top {
       display: flex;
       gap: 14px;
       justify-content: space-between;
       align-items: flex-start;
       margin-bottom: 12px;
+    }
+    .card-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
     }
     .command-name {
       font-family: var(--mono);
@@ -445,6 +520,21 @@ const html = `<!doctype html>
       cursor: pointer;
       font-size: 13px;
       white-space: nowrap;
+    }
+    .pin-btn {
+      border: 1px solid rgba(15, 118, 110, 0.24);
+      background: rgba(255,255,255,0.9);
+      color: var(--accent);
+      border-radius: 999px;
+      padding: 9px 14px;
+      cursor: pointer;
+      font-size: 13px;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+    .pin-btn[aria-pressed="true"] {
+      background: rgba(15, 118, 110, 0.14);
+      border-color: rgba(15, 118, 110, 0.42);
     }
     .meta-row {
       display: flex;
@@ -500,8 +590,11 @@ const html = `<!doctype html>
       .shell { padding: 18px 14px 42px; }
       .hero { padding: 20px; }
       .controls { grid-template-columns: 1fr; }
+      .favorites-header { flex-direction: column; }
+      .favorites-tools { justify-content: flex-start; }
       .card-top { flex-direction: column; }
-      .copy-btn { width: 100%; }
+      .card-actions { width: 100%; flex-direction: column; }
+      .copy-btn, .pin-btn { width: 100%; }
     }
   </style>
 </head>
@@ -541,7 +634,22 @@ const html = `<!doctype html>
     <section class="tips">
       <div class="tip"><strong>交互提示：</strong>先在搜索框里输入站点名或动词，比如 <code>reddit</code>、<code>search</code>、<code>字幕</code>，可以立刻缩小范围。</div>
       <div class="tip"><strong>交互提示：</strong>如果你只想找能直接用的命令，优先选择“公开接口”或“无需浏览器”。</div>
-      <div class="tip"><strong>交互提示：</strong>点“复制”会把 <code>opencli-skill 站点 命令</code> 写入剪贴板，方便你直接以 Skill 的方式继续调用。</div>
+      <div class="tip"><strong>交互提示：</strong>点“置顶”可以把常用命令单独固定到最上面，刷新页面后依然保留；点“复制”会把 <code>opencli-skill 站点 命令</code> 写入剪贴板。</div>
+    </section>
+
+    <section id="favoritesPanel" class="favorites-panel" hidden>
+      <div class="favorites-header">
+        <div>
+          <h2>置顶常用命令</h2>
+          <p>把你最常用的命令单独放在顶部。这里会跟随当前搜索和筛选条件变化，只保留匹配的置顶项。</p>
+        </div>
+        <div class="favorites-tools">
+          <button id="copyPinnedCommands" class="ghost-btn" type="button">复制全部置顶命令</button>
+          <button id="clearPinnedCommands" class="ghost-btn" type="button">清空置顶</button>
+        </div>
+      </div>
+      <div id="favoritesGrid" class="command-grid"></div>
+      <p id="favoritesEmpty" class="favorites-empty">你还没有置顶任何命令。看到常用命令时点一下“置顶”，它就会出现在这里。</p>
     </section>
 
     <div id="results">
@@ -555,13 +663,90 @@ const html = `<!doctype html>
   </main>
 
   <script>
+    const FAVORITES_STORAGE_KEY = "opencli-guide-pinned-commands";
     const searchInput = document.getElementById("searchInput");
     const siteFilter = document.getElementById("siteFilter");
     const strategyFilter = document.getElementById("strategyFilter");
     const browserFilter = document.getElementById("browserFilter");
-    const sections = Array.from(document.querySelectorAll(".site-section"));
-    const cards = Array.from(document.querySelectorAll(".command-card"));
+    const results = document.getElementById("results");
+    const sections = Array.from(results.querySelectorAll(".site-section"));
+    const cards = Array.from(results.querySelectorAll(".command-card"));
     const emptyState = document.getElementById("emptyState");
+    const favoritesPanel = document.getElementById("favoritesPanel");
+    const favoritesGrid = document.getElementById("favoritesGrid");
+    const favoritesEmpty = document.getElementById("favoritesEmpty");
+    const copyPinnedCommandsButton = document.getElementById("copyPinnedCommands");
+    const clearPinnedCommandsButton = document.getElementById("clearPinnedCommands");
+    const cardById = new Map(cards.map((card) => [card.dataset.commandId, card]));
+    let pinnedCommandIds = loadPinnedCommands();
+
+    function loadPinnedCommands() {
+      try {
+        const stored = JSON.parse(localStorage.getItem(FAVORITES_STORAGE_KEY) || "[]");
+        if (!Array.isArray(stored)) return [];
+        return stored.filter((id) => typeof id === "string" && cardById.has(id));
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function savePinnedCommands() {
+      localStorage.setItem(FAVORITES_STORAGE_KEY, JSON.stringify(pinnedCommandIds));
+    }
+
+    function getVisiblePinnedCommandIds() {
+      return pinnedCommandIds.filter((id) => {
+        const card = cardById.get(id);
+        return card && card.style.display !== "none";
+      });
+    }
+
+    function syncPinButtons() {
+      document.querySelectorAll("[data-pin-button='true']").forEach((button) => {
+        const isPinned = pinnedCommandIds.includes(button.dataset.commandId);
+        button.setAttribute("aria-pressed", isPinned ? "true" : "false");
+        button.textContent = isPinned ? "取消置顶" : "置顶";
+      });
+    }
+
+    function renderFavorites() {
+      const visiblePinnedIds = getVisiblePinnedCommandIds();
+      favoritesGrid.innerHTML = "";
+
+      visiblePinnedIds.forEach((id) => {
+        const originalCard = cardById.get(id);
+        if (!originalCard) return;
+        const clone = originalCard.cloneNode(true);
+        favoritesGrid.appendChild(clone);
+      });
+
+      const hasAnyPinned = pinnedCommandIds.length > 0;
+      favoritesPanel.hidden = !hasAnyPinned;
+      favoritesEmpty.style.display = visiblePinnedIds.length === 0 ? "block" : "none";
+      favoritesGrid.style.display = visiblePinnedIds.length === 0 ? "none" : "grid";
+      copyPinnedCommandsButton.disabled = pinnedCommandIds.length === 0;
+      clearPinnedCommandsButton.disabled = pinnedCommandIds.length === 0;
+      syncPinButtons();
+    }
+
+    function togglePinned(commandId) {
+      if (!cardById.has(commandId)) return;
+      if (pinnedCommandIds.includes(commandId)) {
+        pinnedCommandIds = pinnedCommandIds.filter((id) => id !== commandId);
+      } else {
+        pinnedCommandIds = [commandId, ...pinnedCommandIds];
+      }
+      savePinnedCommands();
+      renderFavorites();
+    }
+
+    function flashButton(button, successText, fallbackText) {
+      const original = button.textContent;
+      button.textContent = successText;
+      setTimeout(() => {
+        button.textContent = fallbackText || original;
+      }, 1200);
+    }
 
     function applyFilters() {
       const query = searchInput.value.trim().toLowerCase();
@@ -593,6 +778,7 @@ const html = `<!doctype html>
       });
 
       emptyState.style.display = visibleCards === 0 ? "block" : "none";
+      renderFavorites();
     }
 
     [searchInput, siteFilter, strategyFilter, browserFilter].forEach((element) => {
@@ -600,26 +786,47 @@ const html = `<!doctype html>
       element.addEventListener("change", applyFilters);
     });
 
-    document.querySelectorAll(".copy-btn").forEach((button) => {
-      button.addEventListener("click", async () => {
+    document.addEventListener("click", async (event) => {
+      const pinButton = event.target.closest("[data-pin-button='true']");
+      if (pinButton) {
+        togglePinned(pinButton.dataset.commandId);
+        return;
+      }
+
+      const copyButton = event.target.closest(".copy-btn");
+      if (copyButton) {
+        const button = copyButton;
         const text = button.dataset.command;
         try {
           await navigator.clipboard.writeText(text);
-          const original = button.textContent;
-          button.textContent = "已复制";
-          setTimeout(() => {
-            button.textContent = original;
-          }, 1200);
+          flashButton(button, "已复制");
         } catch (error) {
-          button.textContent = "复制失败";
-          setTimeout(() => {
-            button.textContent = "复制";
-          }, 1200);
+          flashButton(button, "复制失败", "复制");
         }
-      });
+      }
+    });
+
+    copyPinnedCommandsButton.addEventListener("click", async () => {
+      const commands = pinnedCommandIds
+        .map((id) => cardById.get(id)?.querySelector(".copy-btn")?.dataset.command)
+        .filter(Boolean);
+      if (commands.length === 0) return;
+      try {
+        await navigator.clipboard.writeText(commands.join("\\n"));
+        flashButton(copyPinnedCommandsButton, "已复制全部");
+      } catch (error) {
+        flashButton(copyPinnedCommandsButton, "复制失败", "复制全部置顶命令");
+      }
+    });
+
+    clearPinnedCommandsButton.addEventListener("click", () => {
+      pinnedCommandIds = [];
+      savePinnedCommands();
+      renderFavorites();
     });
 
     searchInput.focus();
+    syncPinButtons();
     applyFilters();
   </script>
 </body>

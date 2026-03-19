@@ -11,6 +11,8 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 - 想复用 Chrome 已登录状态抓取站点数据
 - 想执行 `opencli` 已内置的站点命令
 - 想基于 `opencli` 的 `explore` / `generate` / `synthesize` 流程扩展适配器
+- 想先列出内容，再按某几篇的链接继续抓正文并总结
+- 想对 Reddit、Hacker News、知乎条目继续展开看详情
 
 ## Runtime
 
@@ -49,6 +51,14 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 
 - 默认优先直接运行已有内置命令，而不是重写一套抓取逻辑
 - 需要查看命令清单时先运行 `list`
+- 当用户先要列表、后要深入看其中某几篇时，优先复用列表里的原始链接，再运行对应详情命令抓正文
+- 对雪球文章详情，优先使用 `xueqiu detail <链接或ID>`，不要直接抓页面可见卡片摘要
+- 对 Reddit 单帖详情，优先使用 `reddit detail <链接或ID>`；如果需要完整评论树，再考虑 `reddit read`
+- 对 Hacker News 单条详情，优先使用 `hackernews detail <链接或ID>`
+- 对知乎问题详情，优先使用 `zhihu detail <链接或ID>` 先抓取标准化材料，再按 `references/article-summary-prompt.md` 做总结
+- 当用户说“看第 2 篇”“总结 1、3、5”“展开这个链接”时，可以直接按编号或链接继续执行，无需让用户重复描述任务
+- 如果是对列表里若干篇文章做批量总结，默认逐篇抓取，再分别整理；数量很多时可先提醒会稍慢，但继续执行
+- 对需要浏览器登录态的批量 `detail` 抓取（尤其是知乎、Reddit、雪球），默认串行执行，不要并发抓取，以免出现超时、误判未登录或结果为空
 - 当用户请求 `opencli-skill list`、"列出命令"、"有哪些命令" 这类意图时，必须展示完整命令清单，不要只给示例或只列前几项
 - 当完整命令太多影响阅读时，优先生成或打开本地 HTML 导航页，而不是在聊天中一次性塞入超长列表
 - 浏览器命令失败时，优先检查登录状态、扩展连接和 `doctor`
@@ -57,6 +67,8 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 - 如果内容是繁体中文，统一转换为简体中文
 - 输出给用户时必须使用易读的 Markdown 格式，至少要包含标题、要点列表，必要时补充引用块、表格或分节
 - 保留原始链接、作者、时间、排名等关键字段；翻译时不改动事实信息
+- 当用户要求“总结某篇/几篇内容”时，必须套用 `references/article-summary-prompt.md` 中的结构与语气来总结
+- 如果抓到的是软文、广告、信息严重不足或正文缺失，要明确说明无法按正常文章总结，并简短给出原因
 - 只有在需要新增或修改适配器时，才去读上游文档：
   - `vendor/opencli/CLI-EXPLORER.md`
   - `vendor/opencli/CLI-ONESHOT.md`
@@ -77,6 +89,19 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 - 单条详情：用 `##` 标题 + `-` 要点列表
 - 长文本：先给“摘要”，再给“重点”，最后给“原始链接”
 - 有结构化字段时，优先用 Markdown 表格或 YAML/JSON 代码块承载原始数据摘要
+
+### Special case: article follow-up
+
+当用户在列表结果之后要求继续看某篇或某几篇内容时：
+
+1. 先根据上一次列表中的编号定位原始链接
+2. 如果是雪球内容，运行 `xueqiu detail <链接>`
+3. 如果是知乎内容，运行 `zhihu detail <链接>`
+4. `detail` 命令只负责抓取和清洗正文/回答，返回适合总结的标准化材料
+5. 再依据 `references/article-summary-prompt.md` 的结构与语气输出总结
+6. 每篇都保留标题、作者（如有）、原始链接
+7. 如果用户一次点多篇，按篇分节展示，标题里保留原列表编号
+8. 如果这些内容依赖浏览器登录态，抓取阶段按篇串行执行，不要并发
 
 ### Special case: `list`
 
@@ -102,5 +127,9 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 .gemini/skills/opencli-skill/scripts/run-opencli.sh doctor --live
 .gemini/skills/opencli-skill/scripts/run-opencli.sh validate
 .gemini/skills/opencli-skill/scripts/run-opencli.sh reddit hot --limit 5 -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh hackernews detail "https://news.ycombinator.com/item?id=12345678" -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu detail "https://www.zhihu.com/question/123456789" -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
 .gemini/skills/opencli-skill/scripts/run-opencli.sh youtube transcript --url "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ```
