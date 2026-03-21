@@ -56,6 +56,10 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 - 对 Reddit 单帖详情，优先使用 `reddit detail <链接或ID>`；如果需要完整评论树，再考虑 `reddit read`
 - 对 Hacker News 单条详情，优先使用 `hackernews detail <链接或ID>`
 - 对知乎问题详情，优先使用 `zhihu detail <链接或ID>` 先抓取标准化材料，再按 `references/article-summary-prompt.md` 做总结
+- 如果用户明确要求“后台静默抓取知乎”或“不打断当前 Chrome”，优先使用 `zhihu background-browser ...`、`zhihu background-detail ...`、`zhihu background-hot-detail ...`
+- 当前包装层里的 `zhihu hot` 也已经走后台静默抓取；需要少量结果或结构化输出时，可继续加 `--limit`、`-f json`
+- 当前包装层里的 `zhihu detail` 也已经走同一条后台静默抓取链路，优先复用专用 Chrome 会话，不再接管前台主浏览器
+- 同样的后台静默做法已开始扩展到 `xueqiu`、`reddit` 和 `weibo`，对于 `xueqiu hot/detail`、`reddit popular/detail`、`weibo hot`，优先走各自的专用 Chrome profile
 - 当用户说“看第 2 篇”“总结 1、3、5”“展开这个链接”时，可以直接按编号或链接继续执行，无需让用户重复描述任务
 - 如果是对列表里若干篇文章做批量总结，默认逐篇抓取，再分别整理；数量很多时可先提醒会稍慢，但继续执行
 - 对需要浏览器登录态的批量 `detail` 抓取（尤其是知乎、Reddit、雪球），默认串行执行，不要并发抓取，以免出现超时、误判未登录或结果为空
@@ -130,6 +134,18 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 .gemini/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
 .gemini/skills/opencli-skill/scripts/run-opencli.sh hackernews detail "https://news.ycombinator.com/item?id=12345678" -f json
 .gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu detail "https://www.zhihu.com/question/123456789" -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu hot --limit 10 -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser login
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser start
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-hot-detail 1~20
+.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu background-browser login
+.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu hot
+.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit background-browser login
+.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit popular
+.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh weibo background-browser login
+.gemini/skills/opencli-skill/scripts/run-opencli.sh weibo hot
 .gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
 .gemini/skills/opencli-skill/scripts/run-opencli.sh youtube transcript --url "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ```

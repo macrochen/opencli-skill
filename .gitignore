@@ -10,3 +10,5 @@ dist/
 .DS_Store
 venv/
 node_modules/
+.state/
+outputs/

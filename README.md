@@ -39,3 +39,71 @@
 ## Alfred
 
 导入 `assets/alfred-workflow/opencli-guide.alfredworkflow` 后，在 Alfred 输入 `opencli`，会直接在默认浏览器打开本地命令导航页。
+
+## 后台静默抓取实验版
+
+如果你不想让批量抓取打断当前正在使用的 Chrome，可以使用专用的后台浏览器配置：
+
+```bash
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser login
+```
+
+第一次执行时，会启动一个单独的 Chrome profile，请在这个专用窗口里登录知乎一次。之后可以关闭它，再启动后台无头浏览器：
+
+```bash
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser start
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser status
+```
+
+之后连热榜列表也可以走后台模式：
+
+```bash
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu hot
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu hot --limit 10 -f json
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu detail "https://www.zhihu.com/question/123456789" -f json
+```
+
+抓取单篇知乎详情：
+
+```bash
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-detail \
+  "https://www.zhihu.com/question/123456789"
+```
+
+批量抓取时，把 URL 一行一个写进文本文件：
+
+```bash
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-detail-batch \
+  /tmp/zhihu-urls.txt
+```
+
+如果只是想直接按热榜编号区间抓取：
+
+```bash
+.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-hot-detail 1~20
+```
+
+默认输出目录为 `.gemini/skills/opencli-skill/outputs/zhihu/`。这套实验版方案使用独立 `user-data-dir` 和 CDP，不会接管你正在操作的前台 Chrome，但知乎页面结构变化或登录失效时仍需要重新适配。
+
+## 扩展到其他站点
+
+同样的“专用 profile + 动态 CDP”方案现在也已经接到第一批其他站点：
+
+```bash
+.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu background-browser login
+.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu hot
+.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
+
+.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit background-browser login
+.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit popular
+.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
+
+.gemini/skills/opencli-skill/scripts/run-opencli.sh weibo background-browser login
+.gemini/skills/opencli-skill/scripts/run-opencli.sh weibo hot
+```
+
+这批命令都会复用各自独立的 Chrome profile，不再占用你的日常主浏览器窗口。对应 profile 默认位于：
+
+- `.gemini/skills/opencli-skill/.state/xueqiu-background/`
+- `.gemini/skills/opencli-skill/.state/reddit-background/`
+- `.gemini/skills/opencli-skill/.state/weibo-background/`
