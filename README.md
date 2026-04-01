@@ -83,7 +83,7 @@
 .gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-hot-detail 1~20
 ```
 
-默认输出目录为 `.gemini/skills/opencli-skill/outputs/zhihu/`。这套实验版方案使用独立 `user-data-dir` 和 CDP，不会接管你正在操作的前台 Chrome，但知乎页面结构变化或登录失效时仍需要重新适配。
+默认输出目录为当前工作目录下的 `outputs/opencli-skill/<yyyymmdd-zhihu-background>/`。浏览器登录状态和日志会统一落到 `outputs/opencli-skill/shared-zhihu-background-state/`。这套实验版方案使用独立 `user-data-dir` 和 CDP，不会接管你正在操作的前台 Chrome，但知乎页面结构变化或登录失效时仍需要重新适配。
 
 ## 扩展到其他站点
 
@@ -102,8 +102,8 @@
 .gemini/skills/opencli-skill/scripts/run-opencli.sh weibo hot
 ```
 
-这批命令都会复用各自独立的 Chrome profile，不再占用你的日常主浏览器窗口。对应 profile 默认位于：
+这批命令都会复用各自独立的 Chrome profile，不再占用你的日常主浏览器窗口。对应 profile 默认位于当前工作目录下的：
 
-- `.gemini/skills/opencli-skill/.state/xueqiu-background/`
-- `.gemini/skills/opencli-skill/.state/reddit-background/`
-- `.gemini/skills/opencli-skill/.state/weibo-background/`
+- `outputs/opencli-skill/shared-xueqiu-background-state/`
+- `outputs/opencli-skill/shared-reddit-background-state/`
+- `outputs/opencli-skill/shared-weibo-background-state/`

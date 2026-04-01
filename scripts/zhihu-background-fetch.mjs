@@ -8,9 +8,15 @@ import { fileURLToPath } from 'node:url';
 import playwright from '../vendor/opencli/node_modules/playwright/index.js';
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const OUTPUT_DIR = process.env.OPENCLI_BG_OUTPUT_DIR || path.join(ROOT_DIR, 'outputs', 'zhihu');
+const DEFAULT_SKILL_OUTPUT_ROOT = path.join(process.cwd(), 'outputs', 'opencli-skill');
+const DEFAULT_OUTPUT_DIR = path.join(
+  DEFAULT_SKILL_OUTPUT_ROOT,
+  `${new Date().toISOString().slice(0, 10).replace(/-/g, '')}-zhihu-background`,
+);
+const DEFAULT_STATE_DIR = path.join(DEFAULT_SKILL_OUTPUT_ROOT, 'shared-zhihu-background-state');
+const OUTPUT_DIR = process.env.OPENCLI_BG_OUTPUT_DIR || DEFAULT_OUTPUT_DIR;
 const DEFAULT_CDP_HTTP_ENDPOINT = 'http://127.0.0.1:9333';
-const STATE_DIR = process.env.OPENCLI_BG_STATE_DIR || path.join(ROOT_DIR, '.state', 'zhihu-background');
+const STATE_DIR = process.env.OPENCLI_BG_STATE_DIR || DEFAULT_STATE_DIR;
 const HEADLESS_LOG_FILE = path.join(STATE_DIR, 'logs', 'headless.log');
 const DEFAULT_HOT_LIMIT = 50;
 const { chromium } = playwright;

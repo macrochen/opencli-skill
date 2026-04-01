@@ -8,7 +8,8 @@ import { fileURLToPath } from 'node:url';
 import playwright from '../vendor/opencli/node_modules/playwright/index.js';
 
 const ROOT_DIR = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
-const STATE_DIR = process.env.OPENCLI_BG_STATE_DIR || path.join(ROOT_DIR, '.state', 'reddit-background');
+const DEFAULT_SKILL_OUTPUT_ROOT = path.join(process.cwd(), 'outputs', 'opencli-skill');
+const STATE_DIR = process.env.OPENCLI_BG_STATE_DIR || path.join(DEFAULT_SKILL_OUTPUT_ROOT, 'shared-reddit-background-state');
 const DEFAULT_CDP_HTTP_ENDPOINT = process.env.OPENCLI_BG_CDP_HTTP_ENDPOINT || 'http://127.0.0.1:9335';
 const HEADLESS_LOG_FILE = path.join(STATE_DIR, 'logs', 'headless.log');
 const { chromium } = playwright;

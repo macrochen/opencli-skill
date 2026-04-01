@@ -2,6 +2,7 @@
 set -euo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+DEFAULT_OUTPUT_ROOT="$(pwd)/outputs/opencli-skill"
 SITE="${1:-}"
 CMD="${2:-}"
 CHROME_BIN="${OPENCLI_BG_CHROME_BIN:-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome}"
@@ -15,22 +16,22 @@ case "$SITE" in
   zhihu)
     PORT="${OPENCLI_BG_CHROME_PORT:-9333}"
     SITE_URL="https://www.zhihu.com/signin"
-    STATE_DIR="${OPENCLI_BG_STATE_DIR:-$ROOT_DIR/.state/zhihu-background}"
+    STATE_DIR="${OPENCLI_BG_STATE_DIR:-$DEFAULT_OUTPUT_ROOT/shared-zhihu-background-state}"
     ;;
   xueqiu)
     PORT="${OPENCLI_BG_CHROME_PORT:-9334}"
     SITE_URL="https://xueqiu.com/"
-    STATE_DIR="${OPENCLI_BG_STATE_DIR:-$ROOT_DIR/.state/xueqiu-background}"
+    STATE_DIR="${OPENCLI_BG_STATE_DIR:-$DEFAULT_OUTPUT_ROOT/shared-xueqiu-background-state}"
     ;;
   weibo)
     PORT="${OPENCLI_BG_CHROME_PORT:-9336}"
     SITE_URL="https://weibo.com/"
-    STATE_DIR="${OPENCLI_BG_STATE_DIR:-$ROOT_DIR/.state/weibo-background}"
+    STATE_DIR="${OPENCLI_BG_STATE_DIR:-$DEFAULT_OUTPUT_ROOT/shared-weibo-background-state}"
     ;;
   reddit)
     PORT="${OPENCLI_BG_CHROME_PORT:-9335}"
     SITE_URL="https://www.reddit.com/"
-    STATE_DIR="${OPENCLI_BG_STATE_DIR:-$ROOT_DIR/.state/reddit-background}"
+    STATE_DIR="${OPENCLI_BG_STATE_DIR:-$DEFAULT_OUTPUT_ROOT/shared-reddit-background-state}"
     ;;
   *)
     echo "Unsupported site: $SITE" >&2
