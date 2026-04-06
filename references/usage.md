@@ -10,17 +10,17 @@
 ## Common commands
 
 ```bash
-.gemini/skills/opencli-skill/scripts/run-opencli.sh list
-.gemini/skills/opencli-skill/scripts/open-opencli-guide.sh
-.gemini/skills/opencli-skill/scripts/run-opencli.sh hackernews top --limit 10
-.gemini/skills/opencli-skill/scripts/run-opencli.sh hackernews detail "https://news.ycombinator.com/item?id=12345678" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh github search --keyword "cli"
-.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit hot --limit 5 -f yaml
-.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu detail "https://www.zhihu.com/question/123456789" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu hot --limit 10 -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh doctor --live
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh list
+~/.agents/skills/opencli-skill/scripts/open-opencli-guide.sh
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh hackernews top --limit 10
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh hackernews detail "https://news.ycombinator.com/item?id=12345678" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh github search --keyword "cli"
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh reddit hot --limit 5 -f yaml
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh zhihu detail "https://www.zhihu.com/question/123456789" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh xueqiu hot --limit 10 -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh doctor --live
 ```
 
 ## Browser troubleshooting
@@ -51,7 +51,7 @@
 - 当用户要求 `opencli-skill list` 时，先运行：
 
 ```bash
-.gemini/skills/opencli-skill/scripts/run-opencli.sh list -f yaml
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh list -f yaml
 ```
 
 - 基于完整输出整理成 Markdown 命令目录
@@ -64,7 +64,7 @@
 - 打开本地页面：
 
 ```bash
-.gemini/skills/opencli-skill/scripts/open-opencli-guide.sh
+~/.agents/skills/opencli-skill/scripts/open-opencli-guide.sh
 ```
 
 - 页面支持：

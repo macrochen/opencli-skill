@@ -19,15 +19,15 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 先执行一次：
 
 ```bash
-.gemini/skills/opencli-skill/scripts/bootstrap.sh
+~/.agents/skills/opencli-skill/scripts/bootstrap.sh
 ```
 
 之后统一通过下面的包装脚本运行：
 
 ```bash
-.gemini/skills/opencli-skill/scripts/run-opencli.sh list
-.gemini/skills/opencli-skill/scripts/run-opencli.sh hackernews top --limit 5 -f yaml
-.gemini/skills/opencli-skill/scripts/open-opencli-guide.sh
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh list
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh hackernews top --limit 5 -f yaml
+~/.agents/skills/opencli-skill/scripts/open-opencli-guide.sh
 ```
 
 ## Browser prerequisites
@@ -42,7 +42,7 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 首次配置示例：
 
 ```bash
-.gemini/skills/opencli-skill/scripts/run-opencli.sh setup
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh setup
 ```
 
 公共接口命令如 `hackernews top`、`github search`、`v2ex hot` 不依赖浏览器登录。
@@ -126,26 +126,26 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 ## Useful commands
 
 ```bash
-.gemini/skills/opencli-skill/scripts/run-opencli.sh list -f yaml
-.gemini/skills/opencli-skill/scripts/run-opencli.sh doctor
-.gemini/skills/opencli-skill/scripts/run-opencli.sh doctor --live
-.gemini/skills/opencli-skill/scripts/run-opencli.sh validate
-.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit hot --limit 5 -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh hackernews detail "https://news.ycombinator.com/item?id=12345678" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu detail "https://www.zhihu.com/question/123456789" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu hot --limit 10 -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser login
-.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser start
-.gemini/skills/opencli-skill/scripts/run-opencli.sh zhihu background-hot-detail 1~20
-.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu background-browser login
-.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu hot
-.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit background-browser login
-.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit popular
-.gemini/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh weibo background-browser login
-.gemini/skills/opencli-skill/scripts/run-opencli.sh weibo hot
-.gemini/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
-.gemini/skills/opencli-skill/scripts/run-opencli.sh youtube transcript --url "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh list -f yaml
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh doctor
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh doctor --live
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh validate
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh reddit hot --limit 5 -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh hackernews detail "https://news.ycombinator.com/item?id=12345678" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh zhihu detail "https://www.zhihu.com/question/123456789" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh zhihu hot --limit 10 -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser login
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh zhihu background-browser start
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh zhihu background-hot-detail 1~20
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh xueqiu background-browser login
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh xueqiu hot
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh reddit background-browser login
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh reddit popular
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh reddit detail "https://www.reddit.com/r/programming/comments/1abc123/example/" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh weibo background-browser login
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh weibo hot
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh xueqiu detail "https://xueqiu.com/7913104177/380018734" -f json
+~/.agents/skills/opencli-skill/scripts/run-opencli.sh youtube transcript --url "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ```

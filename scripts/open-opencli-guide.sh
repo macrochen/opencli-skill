@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-ROOT_DIR="/Users/shi/workspace/my-skills/.gemini/skills/opencli-skill"
+ROOT_DIR="/Users/shi/.agents/skills/opencli-skill"
 PAGE="$ROOT_DIR/assets/opencli-guide.html"
 GENERATOR="$ROOT_DIR/scripts/generate-opencli-guide.mjs"
 NODE_BIN="/opt/homebrew/bin/node"
