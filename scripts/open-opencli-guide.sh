@@ -2,7 +2,8 @@
 
 set -euo pipefail
 
-ROOT_DIR="/Users/shi/.agents/skills/opencli-skill"
+SCRIPT_DIR="$(cd "$(dirname "${0}")" && pwd)"
+ROOT_DIR="$(cd "${SCRIPT_DIR}/.." && pwd)"
 PAGE="$ROOT_DIR/assets/opencli-guide.html"
 GENERATOR="$ROOT_DIR/scripts/generate-opencli-guide.mjs"
 NODE_BIN="/opt/homebrew/bin/node"
