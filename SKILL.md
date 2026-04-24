@@ -123,6 +123,17 @@ description: Wraps jackwener/opencli as a local skill for turning websites into 
 6. 如果命令很多，允许分节展示，但不能用“其余略”这类省略方式
 7. 如果用户需要高频查询或快速查找，优先引导其使用本地 HTML 页面与 Alfred workflow
 
+## Background Browser 陷阱
+
+各站点的 `background-browser login`（可见窗口）和 `background-browser start`（无头）共用同一端口（zhihu=9333, xueqiu=9334, weibo=9336, reddit=9335），不能同时运行。
+
+**正确顺序：**
+1. 首次登录：先 `stop`（释放端口）→ 再 `login`（弹出可见窗口）→ 用户手动登录
+2. 登录完成后 cookie 保存在 profile 目录中
+3. 后续使用：直接 `start`（无头），自动加载已保存的 cookie
+
+**常见错误：** 先 `start`（无头占了端口）→ 再 `login`（端口被占，Chrome 静默失败，用户看不到登录窗口）。
+
 ## Useful commands
 
 ```bash
